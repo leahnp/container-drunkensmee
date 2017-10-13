@@ -6,18 +6,18 @@ mkdir -p /output/kubernetes/ssl
 mkdir -p /output/etcd/ssl
 
 # Variables are:
-# SERVICE_DNS_NAME - defaults to localhost
-# SERVICE_SHORT_NAME - defaults to localhost
+# HOSTNAME - defaults to localhost
+# SHORT_HOST_NAME - defaults to localhost
 # WORKER_IP - defaults to 127.0.0.1
 # HOST_IP - defaults to 127.0.0.1
 
-if [ -z "$SERVICE_DNS_NAME" ]; then
-  export SERVICE_DNS_NAME=localhost
-  echo "Did not find Service DNS Name - defaulting to ${SERVICE_DNS_NAME}";
+if [ -z "$HOSTNAME" ]; then
+  export HOSTNAME=localhost
+  echo "Did not find host name - defaulting to ${HOSTNAME}";
 else
-  echo "Found Service DNS Name - ${SERVICE_DNS_NAME}";
+  echo "Found host name - ${HOSTNAME}";
 fi
-SERVICE_SHORT_NAME=${SERVICE_DNS_NAME%%.*}
+SHORT_HOST_NAME=${HOSTNAME%%.*}
 
 if [ -z "$WORKER_IP" ]; then
   export WORKER_IP=127.0.0.1
@@ -35,7 +35,7 @@ fi
 
 cp /input/ca.pem /output/kubernetes/ssl/ca.pem
 openssl genrsa -out /output/kubernetes/ssl/worker-key.pem 2048
-openssl req -new -key /output/kubernetes/ssl/worker-key.pem -out /output/kubernetes/ssl/worker.csr -subj "/O=system:nodes,/CN=system:node:${SERVICE_SHORT_NAME}" -config /assets/worker.conf
+openssl req -new -key /output/kubernetes/ssl/worker-key.pem -out /output/kubernetes/ssl/worker.csr -subj "/O=system:nodes,/CN=system:node:${SHORT_HOST_NAME}" -config /assets/worker.conf
 openssl x509 -req -in /output/kubernetes/ssl/worker.csr -CA /output/kubernetes/ssl/ca.pem -CAkey /input/ca-key.pem -CAcreateserial -out /output/kubernetes/ssl/worker.pem -days 3650 -extensions v3_req -extfile /assets/worker.conf
 
 cp /input/ca.pem /output/etcd/ssl/client-ca.pem
