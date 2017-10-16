@@ -47,15 +47,15 @@ openssl genrsa -out /output/etcd/server-$ETCD_CONFIG/ssl/peer-key.pem 2048
 openssl req -new -key /output/etcd/server-$ETCD_CONFIG/ssl/peer-key.pem -out /output/etcd/server-$ETCD_CONFIG/ssl/peer.csr -subj "/CN=etcd-peer" -config /assets/etcd_peer.conf
 openssl x509 -req -in /output/etcd/server-$ETCD_CONFIG/ssl/peer.csr -CA /output/etcd/server-$ETCD_CONFIG/ssl/peer-ca.pem -CAkey /input/ca-key.pem -CAcreateserial -out /output/etcd/server-$ETCD_CONFIG/ssl/peer.pem -days 3650 -extensions v3_req -extfile /assets/etcd_peer.conf
 
-# these are certs for etcd and etcdEvents to communicate as a server 
+# these are certs for etcd and etcdEvents to communicate as a server
 cp /input/ca.pem /output/etcd/server-$ETCD_CONFIG/ssl/server-ca.pem
 openssl genrsa -out /output/etcd/server-$ETCD_CONFIG/ssl/server-key.pem 2048
 openssl req -new -key /output/etcd/server-$ETCD_CONFIG/ssl/server-key.pem -out /output/etcd/server-$ETCD_CONFIG/ssl/server.csr -subj "/CN=etcd-server" -config /assets/etcd_server.conf
 openssl x509 -req -in /output/etcd/server-$ETCD_CONFIG/ssl/server.csr -CA /output/etcd/server-$ETCD_CONFIG/ssl/server-ca.pem -CAkey /input/ca-key.pem -CAcreateserial -out /output/etcd/server-$ETCD_CONFIG/ssl/server.pem -days 3650 -extensions v3_req -extfile /assets/etcd_server.conf
 
-if [ -f /output/etcd/ssl/client-ca.pem ]
+if [ ! -f /output/etcd/ssl/client.pem ]
 then
-  # these files are shared etcd and etcdEvents client certs, they are shared 
+  # these files are shared etcd and etcdEvents client certs, they are shared
   # because Kubernetes API server has a flag for a single etcd cert location
   cp /input/ca.pem /output/etcd/ssl/client-ca.pem
   openssl genrsa -out /output/etcd/ssl/client-key.pem 2048
