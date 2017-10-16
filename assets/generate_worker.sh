@@ -7,7 +7,6 @@ mkdir -p /output/etcd/ssl
 
 # Variables are:
 # HOSTNAME - defaults to localhost
-# SHORT_HOST_NAME - defaults to localhost
 # WORKER_IP - defaults to 127.0.0.1
 # HOST_IP - defaults to 127.0.0.1
 
@@ -34,7 +33,7 @@ fi
 
 cp /input/ca.pem /output/kubernetes/ssl/ca.pem
 openssl genrsa -out /output/kubernetes/ssl/worker-key.pem 2048
-openssl req -new -key /output/kubernetes/ssl/worker-key.pem -out /output/kubernetes/ssl/worker.csr -subj "/O=system:nodes,/CN=system:node:${HOSTNAME}" -config /assets/worker.conf
+openssl req -new -key /output/kubernetes/ssl/worker-key.pem -out /output/kubernetes/ssl/worker.csr -subj "/O=system:nodes/CN=system:node:${HOSTNAME}" -config /assets/worker.conf
 openssl x509 -req -in /output/kubernetes/ssl/worker.csr -CA /output/kubernetes/ssl/ca.pem -CAkey /input/ca-key.pem -CAcreateserial -out /output/kubernetes/ssl/worker.pem -days 3650 -extensions v3_req -extfile /assets/worker.conf
 
 cp /input/ca.pem /output/etcd/ssl/client-ca.pem

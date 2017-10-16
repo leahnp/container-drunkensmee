@@ -7,7 +7,6 @@ mkdir -p /output/etcd/ssl
 
 # Variables are:
 # SERVICE_DNS_NAME - defaults to localhost
-# SHORT_HOST_NAME - defaults to localhost
 # CUSTOM_API_DNS - defaults to localhost
 # SERVICE_IP - defaults to 127.0.0.1
 # HOST_IP - defaults to 127.0.0.1
@@ -56,7 +55,7 @@ fi
 
 cp /input/ca.pem /output/kubernetes/ssl/ca.pem
 openssl genrsa -out /output/kubernetes/ssl/apiserver-key.pem 2048
-openssl req -new -key /output/kubernetes/ssl/apiserver-key.pem -out /output/kubernetes/ssl/apiserver.csr -subj "/O=system:nodes,/CN=system:node:${HOSTNAME}" -config /assets/apiserver.conf
+openssl req -new -key /output/kubernetes/ssl/apiserver-key.pem -out /output/kubernetes/ssl/apiserver.csr -subj "/O=system:nodes/CN=system:node:${HOSTNAME}" -config /assets/apiserver.conf
 openssl x509 -req -in /output/kubernetes/ssl/apiserver.csr -CA /output/kubernetes/ssl/ca.pem -CAkey /input/ca-key.pem -CAcreateserial -out /output/kubernetes/ssl/apiserver.pem -days 3650 -extensions v3_req -extfile /assets/apiserver.conf
 
 cp /input/ca.pem /output/etcd/ssl/client-ca.pem
