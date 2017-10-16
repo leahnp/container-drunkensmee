@@ -3,7 +3,6 @@
 # Assumes /input/ has ca.pem and ca-key.pem
 
 ETCD_CONFIG=$1
-ETCD_INDEX=$2
 
 mkdir -p /output/etcd/server-$ETCD_CONFIG/ssl
 mkdir -p /output/etcd/ssl
@@ -54,7 +53,7 @@ openssl genrsa -out /output/etcd/server-$ETCD_CONFIG/ssl/server-key.pem 2048
 openssl req -new -key /output/etcd/server-$ETCD_CONFIG/ssl/server-key.pem -out /output/etcd/server-$ETCD_CONFIG/ssl/server.csr -subj "/CN=etcd-server" -config /assets/etcd_server.conf
 openssl x509 -req -in /output/etcd/server-$ETCD_CONFIG/ssl/server.csr -CA /output/etcd/server-$ETCD_CONFIG/ssl/server-ca.pem -CAkey /input/ca-key.pem -CAcreateserial -out /output/etcd/server-$ETCD_CONFIG/ssl/server.pem -days 3650 -extensions v3_req -extfile /assets/etcd_server.conf
 
-if [ $ETCD_INDEX == 0 ]
+if [ -f /output/etcd/ssl/client-ca.pem ]
 then
   # these files are shared etcd and etcdEvents client certs, they are shared 
   # because Kubernetes API server has a flag for a single etcd cert location
