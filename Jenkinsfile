@@ -7,7 +7,6 @@ def registry           = "quay.io"
 def registry_user      = "samsung_cnct"
 def robot_secret       = "quay-robot-drunkensmee-container-rw"
 def image_name         = "drunkensmee-container"
-def image_tag          = "${env.RELEASE_VERSION}" != "null" ? "${env.RELEASE_VERSION}" : "latest"
 
 podTemplate(label: "${image_name}", containers: [
     containerTemplate(name: 'jnlp',
@@ -29,6 +28,7 @@ podTemplate(label: "${image_name}", containers: [
         // add a docker rmi/docker purge/etc.
         stage('Checkout') {
           checkout scm
+          
           // retrieve the URI used for checking out the source
           // this assumes one branch with one uri
           git_uri = scm.getRepositories()[0].getURIs()[0].toString()
@@ -47,8 +47,8 @@ podTemplate(label: "${image_name}", containers: [
         stage('Publish') {
           if (git_branch.contains(publish_branch) && git_uri.contains(github_org)) {
             kubesh "docker login ${registry} -u ${USERNAME} -p ${PASSWORD}"
-            kubesh "docker tag ${image_name}:${env.JOB_BASE_NAME}.${env.BUILD_ID} ${registry}/${registry_user}/${image_name}:${image_tag}"
-            kubesh "docker push ${registry}/${registry_user}/${image_name}:${image_tag}"
+            kubesh "docker tag ${image_name}:${env.JOB_BASE_NAME}.${env.BUILD_ID} ${registry}/${registry_user}/${image_name}:\$(git rev-parse --short HEAD)"
+            kubesh "docker push ${registry}/${registry_user}/${image_name}:\$(git rev-parse --short HEAD)"
           } else {
             echo "Not pushing to docker repo:\n    BRANCH_NAME='${env.BRANCH_NAME}'\n    GIT_BRANCH='${git_branch}'\n    git_uri='${git_uri}'"
           }
