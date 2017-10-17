@@ -61,6 +61,10 @@ openssl genrsa -out /output/kubernetes/ssl/apiserver-key.pem 2048
 openssl req -new -key /output/kubernetes/ssl/apiserver-key.pem -out /output/kubernetes/ssl/apiserver.csr -subj "/O=system:nodes/CN=system:node:${HOST_NAME}" -config /assets/apiserver.conf
 openssl x509 -req -in /output/kubernetes/ssl/apiserver.csr -CA /output/kubernetes/ssl/ca.pem -CAkey /input/ca-key.pem -CAcreateserial -out /output/kubernetes/ssl/apiserver.pem -days 3650 -extensions v3_req -extfile /assets/apiserver.conf
 
+openssl genrsa -out /output/kubernetes/ssl/proxy-key.pem 2048
+openssl req -new -key /output/kubernetes/ssl/proxy-key.pem -out /output/kubernetes/ssl/proxy.csr -subj "/O=system:node-proxier/CN=system:kube-proxy" -config /assets/worker.conf
+openssl x509 -req -in /output/kubernetes/ssl/proxy.csr -CA /output/kubernetes/ssl/ca.pem -CAkey /input/ca-key.pem -CAcreateserial -out /output/kubernetes/ssl/proxy.pem -days 3650 -extensions v3_req -extfile /assets/worker.conf
+
 cp /input/ca.pem /output/etcd/ssl/client-ca.pem
 openssl genrsa -out /output/etcd/ssl/client-key.pem 2048
 openssl req -new -key /output/etcd/ssl/client-key.pem -out /output/etcd/ssl/client.csr -subj "/CN=etcd-client" -config /assets/etcd_client.conf
