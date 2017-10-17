@@ -7,55 +7,58 @@ mkdir -p /output/etcd/ssl
 
 # Variables are:
 # SERVICE_DNS_NAME - defaults to localhost
+# HOST_NAME - defaults to localhost
 # CUSTOM_API_DNS - defaults to localhost
 # SERVICE_IP - defaults to 127.0.0.1
 # HOST_IP - defaults to 127.0.0.1
 
 if [ -z "$SERVICE_DNS_NAME" ]; then
-  export SERVICE_DNS_NAME=localhost
+  SERVICE_DNS_NAME=localhost
   echo "Did not find Service DNS Name - defaulting to ${SERVICE_DNS_NAME}";
 else
   echo "Found Service DNS Name - ${SERVICE_DNS_NAME}";
 fi
 
-if [ -z "$HOSTNAME" ]; then
-  export HOSTNAME=localhost
-  echo "Did not find host name - defaulting to ${HOSTNAME}";
+if [ -z "$HOST_NAME" ]; then
+  HOST_NAME=localhost
+  echo "Did not find host name - defaulting to ${HOST_NAME}";
 else
-  echo "Found host name - ${HOSTNAME}";
+  echo "Found host name - ${HOST_NAME}";
 fi
 
 if [ -z "$CUSTOM_API_DNS" ]; then
-  export CUSTOM_API_DNS=localhost
+   CUSTOM_API_DNS=localhost
   echo "Did not find a custom ELB DNS Name for the API Server - defaulting to ${CUSTOM_API_DNS}";
 else
   echo "Found custom ELB DNS Name for the API Server - ${CUSTOM_API_DNS}";
 fi
 
 if [ -z "$SERVICE_IP" ]; then
-  export SERVICE_IP=127.0.0.1
+   SERVICE_IP=127.0.0.1
   echo "Did not find Service IP - defaulting to ${SERVICE_IP}";
 else
   echo "Found Service IP - ${SERVICE_IP}";
 fi
 
 if [ -z "$KUBE_SERVICE_IP" ]; then
-  export KUBE_SERVICE_IP=127.0.0.1
+   KUBE_SERVICE_IP=127.0.0.1
   echo "Did not find Service IP - defaulting to ${KUBE_SERVICE_IP}";
 else
   echo "Found Service IP - ${KUBE_SERVICE_IP}";
 fi
 
 if [ -z "$HOST_IP" ]; then
-  export HOST_IP=127.0.0.1
+   HOST_IP=127.0.0.1
   echo "Did not find Host IP - defaulting to ${HOST_IP}";
 else
   echo "Found Host IP - ${HOST_IP}";
 fi
 
+export SERVICE_DNS_NAME HOST_NAME CUSTOM_API_DNS SERVICE_IP KUBE_SERVICE_IP HOST_IP
+
 cp /input/ca.pem /output/kubernetes/ssl/ca.pem
 openssl genrsa -out /output/kubernetes/ssl/apiserver-key.pem 2048
-openssl req -new -key /output/kubernetes/ssl/apiserver-key.pem -out /output/kubernetes/ssl/apiserver.csr -subj "/O=system:nodes/CN=system:node:${HOSTNAME}" -config /assets/apiserver.conf
+openssl req -new -key /output/kubernetes/ssl/apiserver-key.pem -out /output/kubernetes/ssl/apiserver.csr -subj "/O=system:nodes/CN=system:node:${HOST_NAME}" -config /assets/apiserver.conf
 openssl x509 -req -in /output/kubernetes/ssl/apiserver.csr -CA /output/kubernetes/ssl/ca.pem -CAkey /input/ca-key.pem -CAcreateserial -out /output/kubernetes/ssl/apiserver.pem -days 3650 -extensions v3_req -extfile /assets/apiserver.conf
 
 cp /input/ca.pem /output/etcd/ssl/client-ca.pem
